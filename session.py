@@ -12,12 +12,14 @@ class BpmSession:
         password: str,
         cache_file: str = "session.json",
         headless: bool = True,
+        extra_args: list[str] | None = None,
     ):
         self.base_url = base_url.rstrip("/")
         self.username = username
         self.password = password
         self.cache_file = Path(cache_file)
         self.headless = headless
+        self.extra_args = extra_args or []
         self._client: httpx.Client | None = None
         self._cookies: dict = {}
 
@@ -29,7 +31,7 @@ class BpmSession:
         with sync_playwright() as p:
             browser = p.chromium.launch(
                 headless=self.headless,
-                args=["--no-sandbox", "--disable-dev-shm-usage"],
+                args=["--no-sandbox", "--disable-dev-shm-usage"] + self.extra_args,
             )
             context = browser.new_context(http_credentials={
                 "username": self.username,

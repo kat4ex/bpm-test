@@ -1,5 +1,6 @@
 import os
 import getpass
+import argparse
 import httpx
 from session import BpmSession
 
@@ -20,8 +21,20 @@ def smoke_test(client: httpx.Client):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--no-kerberos",
+        action="store_true",
+        help="Disable Negotiate/Kerberos SSO to test credentials explicitly (simulates Docker)",
+    )
+    args = parser.parse_args()
+
+    extra_args = ["--auth-server-allowlist="] if args.no_kerberos else []
+    if args.no_kerberos:
+        print("[login] Режим --no-kerberos: Kerberos/Negotiate отключён, используются явные креды")
+
     print(f"[login] Подключаюсь к {BPM_URL} (headless=False)...")
-    session = BpmSession(BPM_URL, BPM_USER, BPM_PASS, cache_file=CACHE_FILE, headless=False)
+    session = BpmSession(BPM_URL, BPM_USER, BPM_PASS, cache_file=CACHE_FILE, headless=False, extra_args=extra_args)
     client = session.get_client()
 
     print(f"[login] Финальный URL: {session._last_url}")
