@@ -22,6 +22,7 @@ class BpmSession:
         self.extra_args = extra_args or []
         self._client: httpx.Client | None = None
         self._cookies: dict = {}
+        self._last_url: str = ""
 
     @property
     def cookies(self) -> dict:
