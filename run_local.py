@@ -1,10 +1,11 @@
 import os
+import getpass
 import httpx
 from session import BpmSession
 
 BPM_URL = os.environ.get("BPM_URL", "https://your-bpm-instance.example.com")
 BPM_USER = os.environ.get("BPM_USER", "DOMAIN\\username")
-BPM_PASS = os.environ.get("BPM_PASS", "your-password")
+BPM_PASS = os.environ.get("BPM_PASS") or getpass.getpass(f"Password for {BPM_USER}: ")
 CACHE_FILE = "session_cache/session.json"
 
 
