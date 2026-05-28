@@ -14,6 +14,7 @@ class BpmSession:
         headless: bool = True,
         extra_args: list[str] | None = None,
         verify: bool | str = True,
+        trust_env: bool = False,
     ):
         self.base_url = base_url.rstrip("/")
         self.username = username
@@ -22,6 +23,7 @@ class BpmSession:
         self.headless = headless
         self.extra_args = extra_args or []
         self.verify = verify
+        self.trust_env = trust_env
         self._client: httpx.Client | None = None
         self._cookies: dict = {}
         self._last_url: str = ""
@@ -74,6 +76,7 @@ class BpmSession:
             headers={"BPMCSRF": cookies.get("BPMCSRF", "")},
             timeout=90.0,
             verify=self.verify,
+            trust_env=self.trust_env,
         )
 
     def get_client(self) -> httpx.Client:
