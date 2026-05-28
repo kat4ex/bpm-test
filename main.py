@@ -23,6 +23,7 @@ def main():
         os.environ["BPM_PASS"],
         cache_file="/app/session_cache/session.json",
         verify=ssl_verify,
+        ca_certs_dir="/app/certs",
     )
     client = session.get_client()
     result = fetch(client)

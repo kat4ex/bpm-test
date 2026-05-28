@@ -30,6 +30,7 @@ class BpmSession:
         extra_args: list[str] | None = None,
         verify: bool | str = True,
         trust_env: bool = False,
+        ca_certs_dir: str | Path | None = None,
     ):
         self.base_url = base_url.rstrip("/")
         self.username = username
@@ -39,6 +40,7 @@ class BpmSession:
         self.extra_args = extra_args or []
         self.verify = verify
         self.trust_env = trust_env
+        self.ca_certs_dir = Path(ca_certs_dir) if ca_certs_dir else None
         self._client: httpx.Client | None = None
         self._cookies: dict = {}
         self._last_url: str = ""
@@ -47,15 +49,26 @@ class BpmSession:
     def cookies(self) -> dict:
         return self._cookies
 
+    def _load_ca_certs(self) -> list[dict]:
+        if not self.ca_certs_dir or not self.ca_certs_dir.exists():
+            return []
+        certs = []
+        for ext in ("*.crt", "*.pem", "*.cer"):
+            for path in self.ca_certs_dir.glob(ext):
+                certs.append({"cert": path.read_text()})
+        return certs
+
     def _login_via_playwright(self) -> dict:
         with sync_playwright() as p:
             browser = p.chromium.launch(
                 headless=self.headless,
                 args=["--no-sandbox", "--disable-dev-shm-usage"] + self.extra_args,
             )
+            ca_certificates = self._load_ca_certs()
             context = browser.new_context(
                 http_credentials={"username": self.username, "password": self.password},
-                ignore_https_errors=True,
+                ca_certificates=ca_certificates if ca_certificates else None,
+                ignore_https_errors=not ca_certificates,
             )
             page = context.new_page()
             page.goto(f"{self.base_url}/0/Main.aspx", wait_until="domcontentloaded", timeout=90_000)
