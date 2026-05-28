@@ -1,0 +1,9 @@
+services:
+  worker:
+    build: .
+    environment:
+      BPM_URL: ${BPM_URL}
+      BPM_USER: ${BPM_USER}
+      BPM_PASS: ${BPM_PASS}
+    volumes:
+      - ./session_cache:/app/session_cache
