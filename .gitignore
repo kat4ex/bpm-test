@@ -1,0 +1,5 @@
+.env
+session_cache/
+certs/*.crt
+certs/*.pem
+certs/*.cer
