@@ -1,7 +1,22 @@
+import ssl
 import httpx
 from playwright.sync_api import sync_playwright
 from pathlib import Path
 import json, time
+
+
+def _make_ssl_context(verify: bool | str) -> ssl.SSLContext:
+    if verify is False:
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+    else:
+        ctx = ssl.create_default_context()
+        if isinstance(verify, str):
+            ctx.load_verify_locations(cafile=verify)
+    # OP_LEGACY_SERVER_CONNECT появился в Python 3.12, для 3.10 используем raw value
+    ctx.options |= getattr(ssl, "OP_LEGACY_SERVER_CONNECT", 0x4)
+    return ctx
 
 
 class BpmSession:
@@ -75,7 +90,7 @@ class BpmSession:
             cookies=cookies,
             headers={"BPMCSRF": cookies.get("BPMCSRF", "")},
             timeout=90.0,
-            verify=self.verify,
+            verify=_make_ssl_context(self.verify),
             trust_env=self.trust_env,
         )
 
