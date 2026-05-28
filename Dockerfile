@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.51.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.47.0-jammy
 
 COPY certs/ /usr/local/share/ca-certificates/
 RUN update-ca-certificates
