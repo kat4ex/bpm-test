@@ -36,8 +36,8 @@ class BpmSession:
                 "password": self.password,
             })
             page = context.new_page()
-            page.goto(f"{self.base_url}/0/Main.aspx", wait_until="networkidle")
-            page.wait_for_url(f"{self.base_url}/**", timeout=60_000)
+            page.goto(f"{self.base_url}/0/Main.aspx", wait_until="domcontentloaded", timeout=90_000)
+            page.wait_for_url(f"{self.base_url}/**", timeout=90_000)
             self._last_url = page.url
             cookies = context.cookies()
             browser.close()
