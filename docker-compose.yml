@@ -1,11 +1,12 @@
 services:
   worker:
-    build:
-      context: .
-      network: host
+    build: .
     environment:
       BPM_URL: ${BPM_URL}
       BPM_USER: ${BPM_USER}
       BPM_PASS: ${BPM_PASS}
     volumes:
-      - ./session_cache:/app/session_cache
+      - session_cache:/app/session_cache
+
+volumes:
+  session_cache:
