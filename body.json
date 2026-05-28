@@ -1,0 +1,12 @@
+{
+  "rootSchemaName": "Contact",
+  "operationType": 0,
+  "rowCount": 10,
+  "rowsOffset": 0,
+  "columns": {
+    "items": {
+      "Id":   { "expression": { "expressionType": 0, "columnPath": "Id" } },
+      "Name": { "expression": { "expressionType": 0, "columnPath": "Name" } }
+    }
+  }
+}
