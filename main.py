@@ -1,5 +1,18 @@
 import os
+import json
+from pathlib import Path
+import httpx
 from session import BpmSession
+
+QUERY_URL = "/0/dataservice/json/reply/SelectQuery"
+BODY_FILE = Path("body.json")
+
+
+def fetch(client: httpx.Client) -> dict:
+    body = json.loads(BODY_FILE.read_text(encoding="utf-8"))
+    r = client.post(QUERY_URL, json=body)
+    r.raise_for_status()
+    return r.json()
 
 
 def main():
@@ -12,7 +25,8 @@ def main():
         verify=ssl_verify,
     )
     client = session.get_client()
-    # TODO: парсер
+    result = fetch(client)
+    print(result)
 
 
 if __name__ == "__main__":

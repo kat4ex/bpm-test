@@ -1,13 +1,9 @@
 import os
-import json
 import getpass
 import argparse
-from pathlib import Path
 import httpx
 from session import BpmSession
-
-SMOKE_URL = "/0/dataservice/json/reply/SelectQuery"
-BODY_FILE = Path("body.json")
+from main import fetch, BODY_FILE
 
 BPM_URL = os.environ.get("BPM_URL", "https://your-bpm-instance.example.com")
 BPM_USER = os.environ.get("BPM_USER", "DOMAIN\\username")
@@ -21,14 +17,12 @@ def smoke_test(client: httpx.Client):
         print(f"[smoke] ПРОПУСК: {BODY_FILE} не найден")
         return
 
-    body = json.loads(BODY_FILE.read_text(encoding="utf-8"))
-    print(f"\n[smoke] POST {SMOKE_URL} ...")
-    r = client.post(SMOKE_URL, json=body)
-    print(f"[smoke] Статус: {r.status_code}")
-    if r.status_code == 200:
-        print(f"[smoke] OK:\n{r.text[:500]}")
-    else:
-        print(f"[smoke] ОШИБКА:\n{r.text[:500]}")
+    print(f"\n[smoke] POST {BODY_FILE} ...")
+    try:
+        result = fetch(client)
+        print(f"[smoke] OK:\n{str(result)[:500]}")
+    except httpx.HTTPStatusError as e:
+        print(f"[smoke] ОШИБКА {e.response.status_code}:\n{e.response.text[:500]}")
 
 
 if __name__ == "__main__":
