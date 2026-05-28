@@ -67,7 +67,7 @@ class BpmSession:
             base_url=self.base_url,
             cookies=cookies,
             headers={"BPMCSRF": cookies.get("BPMCSRF", "")},
-            timeout=30.0,
+            timeout=90.0,
         )
 
     def get_client(self) -> httpx.Client:
