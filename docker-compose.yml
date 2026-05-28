@@ -1,6 +1,12 @@
 services:
   worker:
-    build: .
+    build:
+      context: .
+      args:
+        http_proxy: ""
+        https_proxy: ""
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
     environment:
       BPM_URL: ${BPM_URL}
       BPM_USER: ${BPM_USER}
