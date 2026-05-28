@@ -12,6 +12,7 @@ BODY_FILE = Path("body.json")
 BPM_URL = os.environ.get("BPM_URL", "https://your-bpm-instance.example.com")
 BPM_USER = os.environ.get("BPM_USER", "DOMAIN\\username")
 BPM_PASS = os.environ.get("BPM_PASS") or getpass.getpass(f"Password for {BPM_USER}: ")
+BPM_SSL_VERIFY = os.environ.get("BPM_SSL_VERIFY", "false").lower() not in ("0", "false", "no")
 CACHE_FILE = "session_cache/session.json"
 
 
@@ -44,7 +45,7 @@ if __name__ == "__main__":
         print("[login] Режим --no-kerberos: Kerberos/Negotiate отключён, используются явные креды")
 
     print(f"[login] Подключаюсь к {BPM_URL} (headless=False)...")
-    session = BpmSession(BPM_URL, BPM_USER, BPM_PASS, cache_file=CACHE_FILE, headless=False, extra_args=extra_args)
+    session = BpmSession(BPM_URL, BPM_USER, BPM_PASS, cache_file=CACHE_FILE, headless=False, extra_args=extra_args, verify=BPM_SSL_VERIFY)
     client = session.get_client()
 
     print(f"[login] Финальный URL: {session._last_url}")
