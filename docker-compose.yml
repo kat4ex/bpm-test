@@ -1,6 +1,8 @@
 services:
   worker:
-    build: .
+    build:
+      context: .
+      network: host
     environment:
       BPM_URL: ${BPM_URL}
       BPM_USER: ${BPM_USER}
