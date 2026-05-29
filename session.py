@@ -1,5 +1,4 @@
 import ssl
-import subprocess
 import httpx
 from playwright.sync_api import sync_playwright
 from pathlib import Path
@@ -56,6 +55,8 @@ class BpmSession:
         return self._cookies
 
     def _kinit(self) -> None:
+        import krb5
+
         realm = self.kinit_realm
         kdc = os.environ.get("KRB5_KDC", "")
         krb5_conf = f"[libdefaults]\n    default_realm = {realm}\n    dns_lookup_kdc = true\n"
@@ -71,14 +72,12 @@ class BpmSession:
             username = f"{username}@{realm}"
 
         _log(f"kinit {username} ...")
-        result = subprocess.run(
-            ["kinit", username],
-            input=self.password.encode(),
-            capture_output=True,
-            timeout=30,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"kinit failed: {result.stderr.decode()}")
+        ctx = krb5.init_context()
+        principal = krb5.parse_name_flags(ctx, username.encode())
+        creds = krb5.get_init_creds_password(ctx, principal, self.password.encode())
+        ccache = krb5.cc_default(ctx)
+        krb5.cc_initialize(ctx, ccache, principal)
+        krb5.cc_store_cred(ctx, ccache, creds)
         _log("Kerberos ticket получен")
 
     def _login_via_playwright(self) -> dict:
