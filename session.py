@@ -61,8 +61,16 @@ class BpmSession:
             )
             page = context.new_page()
             page.on("framenavigated", lambda frame: (
-                print(f"[playwright] → {frame.url}", flush=True)
+                print(f"[playwright] nav → {frame.url}", flush=True)
                 if frame == page.main_frame else None
+            ))
+            page.on("request", lambda req: (
+                print(f"[playwright] req → {req.method} {req.url[:120]}", flush=True)
+                if req.resource_type in ("xhr", "fetch", "document") else None
+            ))
+            page.on("response", lambda resp: (
+                print(f"[playwright] res ← {resp.status} {resp.url[:120]}", flush=True)
+                if resp.request.resource_type in ("xhr", "fetch", "document") else None
             ))
             print(f"[playwright] Перехожу на {self.base_url}/0/Main.aspx ...", flush=True)
             page.goto(f"{self.base_url}/0/Main.aspx", wait_until="domcontentloaded", timeout=90_000)
