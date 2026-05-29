@@ -1,0 +1,12 @@
+.env
+.env.example
+session_cache/
+.git/
+.gitignore
+.dockerignore
+docker-compose.yml
+run_local.py
+body.json
+__pycache__/
+*.pyc
+*.md
