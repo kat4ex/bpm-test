@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.47.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.51.0-jammy
 
 COPY sources.txt /etc/apt/sources.list
 RUN rm -f /etc/apt/sources.list.d/* \
