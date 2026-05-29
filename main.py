@@ -24,9 +24,11 @@ def main():
         cache_file="/app/session_cache/session.json",
         verify=ssl_verify,
     )
+    print("[main] Получаю сессию...", flush=True)
     client = session.get_client()
+    print("[main] Сессия получена, выполняю запрос...", flush=True)
     result = fetch(client)
-    print(result)
+    print(result, flush=True)
 
 
 if __name__ == "__main__":

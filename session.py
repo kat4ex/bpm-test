@@ -48,21 +48,27 @@ class BpmSession:
         return self._cookies
 
     def _login_via_playwright(self) -> dict:
+        print("[playwright] Запуск Chromium...", flush=True)
         with sync_playwright() as p:
             browser = p.chromium.launch(
                 headless=self.headless,
                 args=["--no-sandbox", "--disable-dev-shm-usage"] + self.extra_args,
             )
+            print("[playwright] Chromium запущен, создаю контекст...", flush=True)
             context = browser.new_context(
                 http_credentials={"username": self.username, "password": self.password},
                 ignore_https_errors=True,
             )
             page = context.new_page()
+            print(f"[playwright] Перехожу на {self.base_url}/0/Main.aspx ...", flush=True)
             page.goto(f"{self.base_url}/0/Main.aspx", wait_until="domcontentloaded", timeout=90_000)
+            print(f"[playwright] domcontentloaded, жду редирект на {self.base_url}...", flush=True)
             page.wait_for_url(f"{self.base_url}/**", timeout=90_000)
             self._last_url = page.url
+            print(f"[playwright] Финальный URL: {self._last_url}", flush=True)
             cookies = context.cookies()
             browser.close()
+        print(f"[playwright] Получено cookies: {list({c['name'] for c in cookies})}", flush=True)
 
         cookie_dict = {c["name"]: c["value"] for c in cookies}
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
