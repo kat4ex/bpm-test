@@ -60,6 +60,10 @@ class BpmSession:
                 ignore_https_errors=True,
             )
             page = context.new_page()
+            page.on("framenavigated", lambda frame: (
+                print(f"[playwright] → {frame.url}", flush=True)
+                if frame == page.main_frame else None
+            ))
             print(f"[playwright] Перехожу на {self.base_url}/0/Main.aspx ...", flush=True)
             page.goto(f"{self.base_url}/0/Main.aspx", wait_until="domcontentloaded", timeout=90_000)
             print(f"[playwright] domcontentloaded, жду редирект на {self.base_url}...", flush=True)
