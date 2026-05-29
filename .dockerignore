@@ -5,7 +5,7 @@ session_cache/
 .gitignore
 .dockerignore
 docker-compose.yml
-run_local.py
+app/run_local.py
 run.ps1
 run.sh
 body.json
