@@ -6,6 +6,8 @@ services:
       BPM_URL: ${BPM_URL}
       BPM_USER: ${BPM_USER}
       BPM_PASS: ${BPM_PASS}
+      KRB5_REALM: ${KRB5_REALM}
+      KRB5_KDC: ${KRB5_KDC:-}
       http_proxy: ""
       https_proxy: ""
       HTTP_PROXY: ""

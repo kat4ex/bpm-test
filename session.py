@@ -1,9 +1,10 @@
 import ssl
+import subprocess
 import httpx
 from playwright.sync_api import sync_playwright
 from pathlib import Path
 from datetime import datetime
-import json, time
+import json, os, time
 
 
 def _log(msg: str):
@@ -35,6 +36,7 @@ class BpmSession:
         extra_args: list[str] | None = None,
         verify: bool | str = True,
         trust_env: bool = False,
+        kinit_realm: str | None = None,
     ):
         self.base_url = base_url.rstrip("/")
         self.username = username
@@ -44,6 +46,7 @@ class BpmSession:
         self.extra_args = extra_args or []
         self.verify = verify
         self.trust_env = trust_env
+        self.kinit_realm = kinit_realm
         self._client: httpx.Client | None = None
         self._cookies: dict = {}
         self._last_url: str = ""
@@ -52,7 +55,35 @@ class BpmSession:
     def cookies(self) -> dict:
         return self._cookies
 
+    def _kinit(self) -> None:
+        realm = self.kinit_realm
+        kdc = os.environ.get("KRB5_KDC", "")
+        krb5_conf = f"[libdefaults]\n    default_realm = {realm}\n    dns_lookup_kdc = true\n"
+        if kdc:
+            krb5_conf += f"\n[realms]\n    {realm} = {{\n        kdc = {kdc}\n    }}\n"
+        Path("/etc/krb5.conf").write_text(krb5_conf)
+
+        username = self.username
+        if "\\" in username:
+            _, user = username.split("\\", 1)
+            username = f"{user}@{realm}"
+        elif "@" not in username:
+            username = f"{username}@{realm}"
+
+        _log(f"kinit {username} ...")
+        result = subprocess.run(
+            ["kinit", username],
+            input=self.password.encode(),
+            capture_output=True,
+            timeout=30,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"kinit failed: {result.stderr.decode()}")
+        _log("Kerberos ticket получен")
+
     def _login_via_playwright(self) -> dict:
+        if self.kinit_realm:
+            self._kinit()
         _log("Запуск Chromium...")
         with sync_playwright() as p:
             browser = p.chromium.launch(

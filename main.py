@@ -23,6 +23,7 @@ def main():
         os.environ["BPM_PASS"],
         cache_file="/app/session_cache/session.json",
         verify=ssl_verify,
+        kinit_realm=os.environ.get("KRB5_REALM"),
     )
     _log("Получаю сессию...")
     client = session.get_client()
