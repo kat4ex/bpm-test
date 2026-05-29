@@ -6,6 +6,8 @@ session_cache/
 .dockerignore
 docker-compose.yml
 run_local.py
+run.ps1
+run.sh
 body.json
 __pycache__/
 *.pyc
