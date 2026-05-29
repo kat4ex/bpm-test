@@ -1,9 +1,7 @@
 FROM mcr.microsoft.com/playwright/python:v1.51.0-jammy
 
 COPY sources.txt /etc/apt/sources.list
-RUN rm -f /etc/apt/sources.list.d/* \
-    && printf 'Acquire::http::Proxy "DIRECT";\nAcquire::https::Proxy "DIRECT";\n' \
-       > /etc/apt/apt.conf.d/00noproxy
+RUN rm -f /etc/apt/sources.list.d/*
 
 COPY certs/ /usr/local/share/ca-certificates/
 RUN apt-get update && apt-get install -y --no-install-recommends krb5-user \
