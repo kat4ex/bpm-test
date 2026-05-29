@@ -2,7 +2,12 @@ import ssl
 import httpx
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+from datetime import datetime
 import json, time
+
+
+def _log(msg: str):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
 def _make_ssl_context(verify: bool | str) -> ssl.SSLContext:
@@ -48,40 +53,40 @@ class BpmSession:
         return self._cookies
 
     def _login_via_playwright(self) -> dict:
-        print("[playwright] Запуск Chromium...", flush=True)
+        _log("Запуск Chromium...")
         with sync_playwright() as p:
             browser = p.chromium.launch(
                 headless=self.headless,
                 args=["--no-sandbox", "--disable-dev-shm-usage", "--no-proxy-server"] + self.extra_args,
             )
-            print("[playwright] Chromium запущен, создаю контекст...", flush=True)
+            _log("Chromium запущен, создаю контекст...")
             context = browser.new_context(
                 http_credentials={"username": self.username, "password": self.password},
                 ignore_https_errors=True,
             )
             page = context.new_page()
             page.on("framenavigated", lambda frame: (
-                print(f"[playwright] nav → {frame.url}", flush=True)
+                _log(f"nav → {frame.url}")
                 if frame == page.main_frame else None
             ))
             page.on("request", lambda req: (
-                print(f"[playwright] req → {req.method} {req.url[:120]}", flush=True)
+                _log(f"req → {req.method} {req.url[:120]}")
                 if req.resource_type in ("xhr", "fetch", "document") else None
             ))
             page.on("response", lambda resp: (
-                print(f"[playwright] res ← {resp.status} {resp.url[:120]}", flush=True)
+                _log(f"res ← {resp.status} {resp.url[:120]}")
                 if resp.request.resource_type in ("xhr", "fetch", "document") else None
             ))
-            print(f"[playwright] Перехожу на {self.base_url}/0/Main.aspx ...", flush=True)
+            _log(f"Перехожу на {self.base_url}/0/Main.aspx ...")
             page.goto(f"{self.base_url}/0/Main.aspx", wait_until="domcontentloaded", timeout=90_000)
 
-            print(f"[playwright] Жду редирект на /0/ ...", flush=True)
+            _log("Жду редирект на /0/ ...")
             page.wait_for_url(f"{self.base_url}/0/**", timeout=90_000)
             self._last_url = page.url
-            print(f"[playwright] Финальный URL: {self._last_url}", flush=True)
+            _log(f"Финальный URL: {self._last_url}")
             cookies = context.cookies()
             browser.close()
-        print(f"[playwright] Получено cookies: {list({c['name'] for c in cookies})}", flush=True)
+        _log(f"Получено cookies: {list({c['name'] for c in cookies})}")
 
         cookie_dict = {c["name"]: c["value"] for c in cookies}
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)

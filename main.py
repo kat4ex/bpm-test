@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 import httpx
-from session import BpmSession
+from session import BpmSession, _log
 
 QUERY_URL = "/0/dataservice/json/reply/SelectQuery"
 BODY_FILE = Path("body.json")
@@ -24,11 +24,11 @@ def main():
         cache_file="/app/session_cache/session.json",
         verify=ssl_verify,
     )
-    print("[main] Получаю сессию...", flush=True)
+    _log("Получаю сессию...")
     client = session.get_client()
-    print("[main] Сессия получена, выполняю запрос...", flush=True)
+    _log("Сессия получена, выполняю запрос...")
     result = fetch(client)
-    print(result, flush=True)
+    _log(f"Готово: {result}")
 
 
 if __name__ == "__main__":
