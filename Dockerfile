@@ -8,7 +8,7 @@ RUN rm -f /etc/apt/sources.list.d/* \
        > /etc/apt/apt.conf.d/00noproxy
 
 COPY certs/ /usr/local/share/ca-certificates/
-RUN apt-get update && apt-get install -y --no-install-recommends libkrb5-dev \
+RUN apt-get update && apt-get install -y --no-install-recommends libkrb5-dev gcc \
     && rm -rf /var/lib/apt/lists/* \
     && update-ca-certificates
 
