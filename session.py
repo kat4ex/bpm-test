@@ -57,7 +57,12 @@ class BpmSession:
         with sync_playwright() as p:
             browser = p.chromium.launch(
                 headless=self.headless,
-                args=["--no-sandbox", "--disable-dev-shm-usage", "--no-proxy-server"] + self.extra_args,
+                args=[
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--no-proxy-server",
+                    "--auth-server-allowlist=*",
+                ] + self.extra_args,
             )
             _log("Chromium запущен, создаю контекст...")
             context = browser.new_context(

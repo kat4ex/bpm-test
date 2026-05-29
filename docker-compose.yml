@@ -6,12 +6,6 @@ services:
       BPM_URL: ${BPM_URL}
       BPM_USER: ${BPM_USER}
       BPM_PASS: ${BPM_PASS}
-      http_proxy: ""
-      https_proxy: ""
-      HTTP_PROXY: ""
-      HTTPS_PROXY: ""
-      no_proxy: "*"
-      NO_PROXY: "*"
     volumes:
       - session_cache:/app/session_cache
 
