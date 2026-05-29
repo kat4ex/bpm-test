@@ -34,7 +34,6 @@ class BpmSession:
         headless: bool = True,
         extra_args: list[str] | None = None,
         verify: bool | str = True,
-        trust_env: bool = False,
         kinit_realm: str | None = None,
     ):
         self.base_url = base_url.rstrip("/")
@@ -44,7 +43,6 @@ class BpmSession:
         self.headless = headless
         self.extra_args = extra_args or []
         self.verify = verify
-        self.trust_env = trust_env
         self.kinit_realm = kinit_realm
         self._client: httpx.Client | None = None
         self._cookies: dict = {}
@@ -90,7 +88,6 @@ class BpmSession:
                 args=[
                     "--no-sandbox",
                     "--disable-dev-shm-usage",
-                    "--no-proxy-server",
                     "--auth-server-allowlist=*",
                 ] + self.extra_args,
             )
@@ -150,7 +147,6 @@ class BpmSession:
             headers={"BPMCSRF": cookies.get("BPMCSRF", "")},
             timeout=90.0,
             verify=_make_ssl_context(self.verify),
-            trust_env=self.trust_env,
         )
 
     def get_client(self) -> httpx.Client:
