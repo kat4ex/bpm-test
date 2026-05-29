@@ -66,8 +66,16 @@ class BpmSession:
             ))
             print(f"[playwright] Перехожу на {self.base_url}/0/Main.aspx ...", flush=True)
             page.goto(f"{self.base_url}/0/Main.aspx", wait_until="domcontentloaded", timeout=90_000)
-            print(f"[playwright] domcontentloaded, жду редирект на {self.base_url}...", flush=True)
-            page.wait_for_url(f"{self.base_url}/**", timeout=90_000)
+
+            if "/Login/" in page.url:
+                print("[playwright] SSO не прошёл, пробую форменный логин...", flush=True)
+                page.goto(f"{self.base_url}/Login/NuiLogin.aspx", wait_until="domcontentloaded", timeout=90_000)
+                page.fill("#UserName", self.username)
+                page.fill("#UserPassword", self.password)
+                page.click("#enter")
+
+            print(f"[playwright] Жду редирект на /0/ ...", flush=True)
+            page.wait_for_url(f"{self.base_url}/0/**", timeout=90_000)
             self._last_url = page.url
             print(f"[playwright] Финальный URL: {self._last_url}", flush=True)
             cookies = context.cookies()
