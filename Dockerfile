@@ -1,5 +1,8 @@
 FROM mcr.microsoft.com/playwright/python:v1.47.0-jammy
 
+COPY sources.txt /etc/apt/sources.list
+RUN rm -f /etc/apt/sources.list.d/*
+
 COPY certs/ /usr/local/share/ca-certificates/
 RUN apt-get update && apt-get install -y --no-install-recommends libkrb5-dev \
     && rm -rf /var/lib/apt/lists/* \
