@@ -1,6 +1,7 @@
 services:
   worker:
     build: .
+    network_mode: host
     environment:
       BPM_URL: ${BPM_URL}
       BPM_USER: ${BPM_USER}
